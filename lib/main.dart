@@ -1,16 +1,28 @@
+import 'package:courses_repository/courses_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:white_label/firebase_options.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  final coursesRepository = CoursesRepository();
+  runApp(
+    MyApp(
+      coursesRepository: coursesRepository,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.coursesRepository,
+  });
+
+  final CoursesRepository coursesRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +32,23 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Learnie'),
+      home: MyHomePage(
+        title: 'Learnie',
+        coursesRepository: coursesRepository,
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+    required this.title,
+    required this.coursesRepository,
+  });
 
   final String title;
+  final CoursesRepository coursesRepository;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -51,17 +71,34 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: FutureBuilder<List<Course>>(
+          future: widget.coursesRepository.fetchCourses(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final courses = snapshot.data ?? <Course>[];
+              return ListView.builder(
+                itemCount: courses.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(courses[index].name),
+                    subtitle: Text(courses[index].description),
+                  );
+                },
+              );
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                  'You have pushed the button this many times:',
+                ),
+                Text(
+                  '$_counter',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ],
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
