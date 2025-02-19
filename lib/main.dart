@@ -4,7 +4,10 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:courses_repository/courses_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
+import 'package:white_label/add_course/add_course.dart';
+import 'package:white_label/buy_course/view/buy_course_button.dart';
 import 'package:white_label/firebase_options.dart';
 
 Future<void> main() async {
@@ -25,7 +28,7 @@ Future<void> main() async {
   firestore.useFirestoreEmulator('localhost', 8080);
 
   final apiClient = ApiClient(
-    baseUrl: 'http://127.0.0.1:5001',
+    baseUrl: 'localhost:5001',
     client: Client(),
   );
   final coursesRepository = CoursesRepository(
@@ -33,22 +36,16 @@ Future<void> main() async {
     firestore: firestore,
     apiClient: apiClient,
   );
-  // const course = Course(
-  //   name: 'Name',
-  //   description: 'Description',
-  // );
-  // final courseId = await coursesRepository.addCourse(course);
-  // await coursesRepository.buyCourse(courseId);
 
   runApp(
-    MyApp(
+    App(
       coursesRepository: coursesRepository,
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({
+class App extends StatelessWidget {
+  const App({
     super.key,
     required this.coursesRepository,
   });
@@ -57,22 +54,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: MyHomePage(
-        title: 'Learnie',
-        coursesRepository: coursesRepository,
+    return RepositoryProvider.value(
+      value: coursesRepository,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: CoursesListView(
+          title: 'Learnie',
+          coursesRepository: coursesRepository,
+        ),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
+class CoursesListView extends StatelessWidget {
+  const CoursesListView({
     super.key,
     required this.title,
     required this.coursesRepository,
@@ -82,59 +82,44 @@ class MyHomePage extends StatefulWidget {
   final CoursesRepository coursesRepository;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: FutureBuilder<List<Course>>(
-          future: widget.coursesRepository.fetchCourses(),
+          future: coursesRepository.fetchCourses(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            } else {
               final courses = snapshot.data ?? <Course>[];
               return ListView.builder(
                 itemCount: courses.length,
                 itemBuilder: (context, index) {
+                  final course = courses[index];
                   return ListTile(
-                    title: Text(courses[index].name),
-                    subtitle: Text(courses[index].description),
+                    title: Text(course.name),
+                    subtitle: Text(course.description),
+                    trailing: BuyCourseButton(
+                      course: course,
+                    ),
                   );
                 },
               );
             }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text(
-                  'You have pushed the button this many times:',
-                ),
-                Text(
-                  '$_counter',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ],
-            );
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: () {
+          Navigator.of(context).push(AddCoursePage.route());
+        },
+        tooltip: 'Add Course',
         child: const Icon(Icons.add),
       ),
     );
