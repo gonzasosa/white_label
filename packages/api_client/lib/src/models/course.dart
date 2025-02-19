@@ -6,13 +6,13 @@ import 'package:equatable/equatable.dart';
 class Course extends Equatable {
   /// {@macro course}
   const Course({
-    required this.id,
     required this.name,
     required this.description,
+    this.id,
   });
 
   /// The course's ID.
-  final String id;
+  final String? id;
 
   /// The course's name.
   final String name;

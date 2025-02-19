@@ -1,6 +1,10 @@
+import 'package:api_client/api_client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:courses_repository/courses_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:white_label/firebase_options.dart';
 
 Future<void> main() async {
@@ -8,7 +12,34 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final coursesRepository = CoursesRepository();
+
+  final functions = FirebaseFunctions.instance;
+  functions.useFunctionsEmulator('localhost', 5001);
+
+  final firestore = FirebaseFirestore.instance;
+  firestore.settings = const Settings(
+    persistenceEnabled: false,
+    host: 'localhost:8080',
+    sslEnabled: false,
+  );
+  firestore.useFirestoreEmulator('localhost', 8080);
+
+  final apiClient = ApiClient(
+    baseUrl: 'http://127.0.0.1:5001',
+    client: Client(),
+  );
+  final coursesRepository = CoursesRepository(
+    functions: functions,
+    firestore: firestore,
+    apiClient: apiClient,
+  );
+  // const course = Course(
+  //   name: 'Name',
+  //   description: 'Description',
+  // );
+  // final courseId = await coursesRepository.addCourse(course);
+  // await coursesRepository.buyCourse(courseId);
+
   runApp(
     MyApp(
       coursesRepository: coursesRepository,
