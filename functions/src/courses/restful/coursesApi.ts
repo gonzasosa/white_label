@@ -1,10 +1,8 @@
 import {getFirestore} from "firebase-admin/firestore";
-import {onRequest} from "firebase-functions/https";
+import {Request, Response} from "express";
 
-// Take the text parameter passed to this HTTP endpoint and insert it into
-// Firestore under the path /courses/:documentId
-const postCourseComment = onRequest(async (req, res) => {
-  const courseId = req.body.courseId;
+const createCourseComment = async (req: Request, res: Response) => {
+  const courseId = req.params.courseId;
   const comment = req.body.comment;
 
   if (!courseId || !comment) {
@@ -14,10 +12,10 @@ const postCourseComment = onRequest(async (req, res) => {
   }
 
   const db = getFirestore();
-  await db.collection("courses").doc(courseId)
-    .update({comment: comment});
+  await db.collection("courses").doc(courseId).collection("comments").
+    add({comment: comment});
 
   res.status(200).send();
-});
+};
 
-export {postCourseComment};
+export {createCourseComment};

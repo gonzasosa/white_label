@@ -12,7 +12,7 @@ void main() {
       final functions = FirebaseFunctions.instance;
       final firestore = FirebaseFirestore.instance;
       final apiClient = ApiClient(
-        baseUrl: 'https://us-central1-white-label-caa9b.cloudfunctions.net',
+        baseUrl: 'https://us-central1-white-label-caa9b.cloudfunctions.net/api',
         client: Client(),
       );
 
