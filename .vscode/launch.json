@@ -4,34 +4,17 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "white_label",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "white_label (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "white_label (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        },
-        {
-            "name": "api_client",
-            "cwd": "packages/api_client",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "courses_repository",
-            "cwd": "packages/courses_repository",
-            "request": "launch",
-            "type": "dart"
-        }
+      {
+        "name": "Launch [Web] development",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main/main_development.dart",
+      },
+      {
+        "name": "Launch [Web] production",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main/main_production.dart",
+      },
     ]
-}
+  }

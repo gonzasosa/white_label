@@ -52,10 +52,14 @@ class CourseResource {
     required String comment,
   }) async {
     try {
-      await _client.patch(
-        Uri.parse('$_baseUrl/courses/$courseId/comments'),
-        body: {'comment': comment},
+      final response = await _client.patch(
+        Uri.parse('$_baseUrl/postCourseComment'),
+        body: {
+          'courseId': courseId,
+          'comment': comment,
+        },
       );
+      print(response.body);
     } catch (error, stackTrace) {
       throw PostCommentFailure(
         error: error,

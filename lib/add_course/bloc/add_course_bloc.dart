@@ -39,11 +39,15 @@ class AddCourseBloc extends Bloc<AddCourseEvent, AddCourseState> {
   ) async {
     try {
       emit(state.copyWith(status: AddCourseStatus.loading));
-      await _coursesRepository.addCourse(
+      final courseId = await _coursesRepository.addCourse(
         Course(
           name: state.name,
           description: state.description,
         ),
+      );
+      await _coursesRepository.addComment(
+        courseId: courseId,
+        comment: 'Comment!',
       );
       emit(state.copyWith(status: AddCourseStatus.success));
     } catch (_) {
