@@ -4,7 +4,6 @@ import {onRequest} from "firebase-functions/https";
 // Take the text parameter passed to this HTTP endpoint and insert it into
 // Firestore under the path /courses/:documentId
 const postCourseComment = onRequest(async (req, res) => {
-  console.log(req.body);
   const courseId = req.body.courseId;
   const comment = req.body.comment;
 

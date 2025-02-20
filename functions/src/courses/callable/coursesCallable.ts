@@ -3,7 +3,6 @@ import {onCall} from "firebase-functions/https";
 
 const buyCourse = onCall(async (request) => {
   const courseId = request.data.courseId;
-  console.log(request.data);
 
   if (!courseId) {
     throw new Error("Invalid request. Please provide courseId.");
@@ -18,6 +17,7 @@ const buyCourse = onCall(async (request) => {
   }
 
   const numOfPurchases = courseData.numOfPurchases ?? 0;
+
   // TODO: Open transaction
   await courseRef.update({numOfPurchases: numOfPurchases + 1});
 });
