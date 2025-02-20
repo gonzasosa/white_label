@@ -20,11 +20,11 @@ class App extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
         ),
         home: CoursesListView(
-          title: 'Learnie',
+          title: 'SeekNow',
           coursesRepository: coursesRepository,
         ),
       ),
